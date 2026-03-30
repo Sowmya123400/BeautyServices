@@ -7,7 +7,88 @@
     <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
+   <script>
+        
+        function UpdateTotal(checkbox){
+            // 
+
+            const modal = checkbox.closest(".modal");
+            let total = 0;
+        const checkboxes = modal.querySelectorAll("input[type='checkbox']");
+
+        
+        checkboxes.forEach(function(cb){
+            if(cb.checked){
+                total += parseFloat(cb.value);
+                cb.closest(".service-list").classList.add("selected");
+            }
+            else{
+                cb.closest(".service-list").classList.remove("selected");
+            }
+        })
+        modal.querySelector(".total-price").innerHTML ="$"+ total;
+    }
+
+
+    function BookAppointment(button){
+         const modal = button.closest(".modal");
+        const checkboxes = modal.querySelectorAll("input[type='checkbox']:checked");
+
+        if(checkboxes.length==0){
+            alert("Please select at least one service to book an appointent.");
+            return;
+        }
+
+         // ✅ Something selected → manually open dropdown
+    // Get selected service names for WhatsApp message
+    let selectedServices =[];
+    checkboxes.forEach(function(checkbox){
+        selectedServices.push(checkbox.dataset.name);
+
+    })
+
+    let total = modal.querySelector(".total-price").innerHTML;
+    let message = `Hi, I want to book an appointment at ElegantLook Beauty Services.
+    Services Selected:
+    ${selectedServices.join(", ")}
+    Total Amount: ${total}
+    
+    Please confirm my appointment. Thank you!`;;
+
+    // ✅ Update WhatsApp link with selected services
+        modal.querySelector(".whatsappLink").href = 
+            `https://wa.me/12254095902?text=${encodeURIComponent(message)}`;
+            //open dropdowm manually
+
+            modal.querySelector(".callLink").href = "tel:12253044138";
+
+
+             // ✅ Show dropdown manually
+        const dropdownMenu = modal.querySelector(".bookingDropdown");
+        dropdownMenu.classList.toggle("show");
+
+        //
+
+    }
+   
+        // ✅ Close dropdown when clicking outside
+    document.addEventListener("click", function(e) {
+        if (!e.target.closest(".dropdown")) {
+            document.querySelectorAll(".bookingDropdown").forEach(function(dropdown){
+                dropdown.classList.remove("show");
+            });
+        }
+    });
+
+    
+
+
+   </script>
+   
+   
+   
+   
+   <style>
       
         header{
             display:flex;
@@ -127,7 +208,61 @@
         font-style: italic;
        }
 
+       .service-list{
+        display:flex;
+        justify-content:space-between;
+        padding:10px;
+        align-items: center;
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 8px;
+        cursor:pointer;
+        width:100%;
+        background: #fffaf5;
+       }
+
+       .service-list:hover {
+    border-color: rgb(78, 59, 21);
+    background: #fdf3e7;
+       }
+
+       .service-list.selected {
+        border-color:bisque;
+        background:#fdf3e7;
+        box-shadow: 0 0 10px rgba(78,59,21,0.5);
+       }
+
+       .service-list input[type="checkbox"]{
+        margin-right:20px;
+        height:20px;
+        width:20px;
+        accent-color: rgb(78, 59, 21);
+        cursor:pointer
+       }
+
+       .service-label{
+        font-size:15px;
+        color: rgb(77, 54, 10) ;
+        font-weight: bold;
+        font-style: italic;
+        
+       }
+       .service-price{
+        font-size:15px;
+        color: rgb(77, 54, 10) ;
+        font-weight: bold;
+        font-style: italic;
+
+       }
+
        
+       #btnBook{
+        display:flex;
+        justify-content:space-between;
+       }
+
+      
+
 
     </style>
  
@@ -140,7 +275,7 @@
                 <span class="header-title">✨ElegantLook</span>
             </div>
             <div class="header-social">
-               <span class="bi bi-instagram "><span><a href=""> MyInstagram</a></span></span>
+               <span class="bi bi-instagram "><span><a href="https://www.instagram.com/makeoverbysowmya2025?igsh=MW1iNHYyMG5ic25jOQ%3D%3D&utm_source=qr" target="_blank" class="text-decoration-none"> MyInstagram</a></span></span>
             </div>
         </header>
 
@@ -172,8 +307,69 @@
                         Party & Bridal Makeup
                     </div>
                 </div>
-                <div class="card-footer">
-                    <button class="btn btn-outline-primary w-100">Book Makeup</button>
+                <div class="card-footer" data-bs-toggle="collapse" data-bs-target="#makeup">
+                    <button data-bs-toggle="modal" data-bs-target="#bookMakeup"class="btn btn-outline-primary w-100">Book Makeup</button>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="bookMakeup">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>✨Makeup Price List</h3>
+                            <button data-bs-dismiss="modal"class="btn btn-close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Select one or more makeup service:</p>
+                            <label  class=" service-list " id="item-HDMakeup">
+                               <input type="checkbox" value = "60" data-name="HD Makeup" onchange = "UpdateTotal(this)">
+                                <span class="service-label">HD Makeup</span>
+                                <span class="service-price">60</span>
+                            </label>
+                            <label class="service-list" id="item-GlossyMakeup">
+                                <input type="checkbox" value = "40" data-name="Glossy Makeup" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Glossy Makeup</span>
+                                <span  class="service-price">$50</span>
+                               
+                            </label>
+
+                            <label class="service-list" id="item-bridal">
+                                <input type="checkbox" value = "100" data-name="Bridal Makeup" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Bridal Makeup</span>
+                                <span class="service-price">$100</span>
+                               
+                            </label>
+
+                            <label class="service-list" id="item-MatteMakeup">
+                                <input type="checkbox" value = "100" data-name="Matte Makeup" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Matte Makeup</span>
+                                <span class="service-price">$50</span>
+                               
+                            </label>
+
+                            <div style = "display:flex ;justify-content:space-between; align-items:center" class="service-list ">
+                                <span  class="fw-bold">Total:</span>
+                                <span class="total-price fw-bold"> $0</span>
+                                
+                                
+                            </div>
+                            <div class="dropdown" style="display:flex ;justify-content:flex-end;">
+                            <button  data-bs-target="#call" class="btn btn-success mt-2" id = "btnBook" onclick = "BookAppointment(this)">Book Appointment</button>
+                            <ul class="dropdown-menu bookingDropdown">
+                                <li>
+                                    <a class="dropdown-item whatsappLink" href="https://wa.me/12254095902" target="_blank"> <span class="bi bi-whatsapp text-success"></span>WhatsApp
+
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item callLink" href="tel:12254095902"> <span class="bi bi-telephone text-success"></span>Call </a>
+                                </li>
+                            </ul>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
@@ -210,24 +406,45 @@
                             <button data-bs-dismiss="modal"class="btn btn-close"></button>
                         </div>
                         <div class="modal-body">
-                            <dl  class="d-flex justify-content-between">
-                                <dt>Partywear Hairstyle</dt>
-                                <dt>&#36;50</dt>
-                            </dl>
-                            <dl class="d-flex justify-content-between">
-                                  <dt>Bun Hairstyles</dt>
-                                <dd>&#36;40</dd>
+                            <p>Select one or more hairstyle:</p>
+                            <label  class=" service-list " id="item-party">
+                               <input type="checkbox" value = "50" data-name="Partywear Hairstyle" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Partywear Hairstyle</span>
+                                <span class="service-price">$50</span>
+                            </label>
+                            <label class="service-list" id="item-bun">
+                                <input type="checkbox" value = "40" data-name="Bun Hairstyle" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Bun Hairstyle</span>
+                                <span  class="service-price">$40</span>
                                
-                            </dl>
+                            </label>
 
-                            <dl class="d-flex justify-content-between">
-
+                            <label class="service-list" id="item-bridal">
+                                <input type="checkbox" value = "100" data-name="Bridal Hairstyle" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Bridal Hairstyle</span>
+                                <span class="service-price">$100</span>
                                
-                                 <dt>Bridal Hairstyles</dt>
-                                <dd>&#36;100</dd>
+                            </label>
 
-                            </dl>
-                           
+                            <div style = "display:flex ;justify-content:space-between; align-items:center" class="service-list ">
+                                <span  class="fw-bold">Total:</span>
+                                <span class="total-price fw-bold"> $0</span>
+                                
+                                
+                            </div>
+                            <div class="dropdown" style="display:flex ;justify-content:flex-end;">
+                            <button  data-bs-target="#call" class="btn btn-success mt-2" id = "btnBook" onclick = "BookAppointment(this)">Book Appointment</button>
+                            <ul class="dropdown-menu bookingDropdown">
+                                <li>
+                                    <a class="dropdown-item whatsappLink" href="https://wa.me/12254095902" target="_blank"> <span class="bi bi-whatsapp text-success"></span>WhatsApp
+
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item callLink" href="tel:12254095902"> <span class="bi bi-telephone text-success"></span>Call </a>
+                                </li>
+                            </ul>
+                            </div>
                         </div>
 
                     </div>
@@ -251,15 +468,99 @@
                         Party & Bridal Sareedraping
                     </div>
                 </div>
-                <div class="card-footer">
-                    <button class="btn btn-outline-primary w-100">Book Sareedraping</button>
+                <div class="card-footer" data-bs-toggle="collapse" data-bs-target="#SareeDrape">
+                    <button data-bs-toggle="modal" data-bs-target="#bookSareeDraping"class="btn btn-outline-primary w-100">Book Sareedraping</button>
                 </div>
             </div>
         </div>
 
+
+        
+
+            <div class="modal fade" id="bookSareeDraping">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>✨Saree Draping Price List</h3>
+                            <button data-bs-dismiss="modal"class="btn btn-close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Select one or more saree draping service:</p>
+                            <label  class=" service-list " id="item-southIndianDrape">
+                               <input type="checkbox" value = "40" data-name="South Indian Drape" onchange = "UpdateTotal(this)">
+                                <span class="service-label">South Indian Drape</span>
+                                <span class="service-price">40</span>
+                            </label>
+                            <label class="service-list" id="item-BengaliSareeDraping">
+                                <input type="checkbox" value = "40" data-name="Bengali Saree Draping" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Bengali Saree Draping</span>
+                                <span  class="service-price">$50</span>
+                               
+                            </label>
+
+                            <label class="service-list" id="item-bridal">
+                                <input type="checkbox" value = "70" data-name="Bridal Saree Draping" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Bridal Saree Draping</span>
+                                <span class="service-price">$70</span>
+                               
+                            </label>
+
+                            <label class="service-list" id="item-MarathiSareeDrape">
+                                <input type="checkbox" value = "50" data-name="Marathi Saree Drape" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Marathi Saree Drape</span>
+                                <span class="service-price">$50</span>
+                               
+                            </label>
+
+                            <label class="service-list" id="item-PeacockDrape">
+                                <input type="checkbox" value = "30" data-name="Peacock Drape" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Peacock Drape</span>
+                                <span class="service-price">$30</span>
+                               
+                            </label>
+
+                            <label class="service-list" id="item-SareeBoxFloding">
+                                <input type="checkbox" value = "40" data-name="Saree Box Folding" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Saree Box Folding</span>
+                                <span class="service-price">$40</span>
+                               
+                            </label>
+
+                             <label class="service-list" id="item-fluffyPleats">
+                                <input type="checkbox" value = "30" data-name="Saree Fluffy Pleats" onchange = "UpdateTotal(this)">
+                                <span class="service-label">Saree Fluffy Pleats</span>
+                                <span class="service-price">$30</span>
+                               
+                            </label>
+
+                            <div style = "display:flex ;justify-content:space-between; align-items:center" class="service-list ">
+                                <span  class="fw-bold">Total:</span>
+                                <span class="total-price fw-bold"> $0</span>
+                                
+                                
+                            </div>
+                            <div class="dropdown" style="display:flex ;justify-content:flex-end;">
+                            <button  data-bs-target="#call" class="btn btn-success mt-2" id = "btnBook" onclick = "BookAppointment(this)">Book Appointment</button>
+                            <ul class="dropdown-menu bookingDropdown">
+                                <li>
+                                    <a class="dropdown-item whatsappLink" href="https://wa.me/12254095902" target="_blank"> <span class="bi bi-whatsapp text-success"></span>WhatsApp
+
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item callLink" href="tel:12254095902"> <span class="bi bi-telephone text-success"></span>Call </a>
+                                </li>
+                            </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         <div class="contact-us text-center ">
             <h3 class="mt-4">Contact Us</h3>
-            <button class="btn btn-warning w-10  m-4 p-2 ">Call Now</button>
+            <a href="tel:12254095902" class="btn btn-warning w-10  m-4 p-2 ">Call Now</a>
         </div>
         <footer>
             <div class="rights-reserved bg-black text-center p-4 ">
